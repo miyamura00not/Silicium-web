@@ -14,7 +14,7 @@ Minimal interface. Instant injection. Zero bloat.
 
 [![Release](https://img.shields.io/github/v/release/miyamura00not/Silicium-web?color=F5820A&labelColor=0D0A08&style=flat-square)](https://github.com/miyamura00not/Silicium-web/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-Windows%20x64-F5820A?labelColor=0D0A08&style=flat-square)](#)
-[![Website](https://img.shields.io/badge/website-getsilicium.netlify.app-F5820A?labelColor=0D0A08&style=flat-square)](https://getsilicium.netlify.app)
+[![Website](https://img.shields.io/badge/website-getsilicium.netlify.app-F5820A?labelColor=0D0A08&style=flat-square)](https://usesilicium.netlify.app)
 [![Closed Source](https://img.shields.io/badge/source-closed-F5820A?labelColor=0D0A08&style=flat-square)](#)
 
 </div>
@@ -67,5 +67,5 @@ For **educational purposes only**. Use of script executors may violate Roblox's 
 ---
 
 <div align="center">
-<sub>🔥 <a href="https://getsilicium.netlify.app">getsilicium.netlify.app</a></sub>
+<sub>🔥 <a href="https://usesilicium.netlify.app">usesilicium.netlify.app</a></sub>
 </div>
