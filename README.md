@@ -14,7 +14,7 @@ Minimal interface. Instant injection. Zero bloat.
 
 [![Release](https://img.shields.io/github/v/release/yourusername/silicium?color=F5820A&labelColor=0D0A08&style=flat-square)](https://github.com/yourusername/silicium/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-Windows%20x64-F5820A?labelColor=0D0A08&style=flat-square)](https://github.com/yourusername/silicium/releases/latest)
-[![Website](https://img.shields.io/badge/website-getsilicium.netlify.app-F5820A?labelColor=0D0A08&style=flat-square)](https://getsilicium.netlify.app)
+[![Website](https://img.shields.io/badge/website-getsilicium.netlify.app-F5820A?labelColor=0D0A08&style=flat-square)](https://usesilicium.netlify.app)
 
 </div>
 
