@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Silicium — A precision-built Roblox script executor with instant injection, Lua syntax highlighting, and zero bloat."/>
+  <title>Silicium — Roblox Script Executor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+  <style>
+/* ═══════════════════════════════════════════════════════════
+   SILICIUM — Main Stylesheet
+   Waylay Palette: Void › Ink › Surface › Raised › Rim › Muted › Ghost › Light › Glow › Gold
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Variables ──────────────────────────────────────────────── */
+:root {
+  --void:       #060304;
+  --ink:        #0D0A08;
+  --surface:    #161009;
+  --raised:     #1E160A;
+  --rim:        #2E1F0A;
+  --muted:      #5C3E18;
+  --ghost:      #C49A5A;
+  --light:      #E8C88A;
+  --glow:       #F5820A;
+  --gold:       #FFB730;
+
+  --font-display: 'Cinzel', 'Trajan Pro', Georgia, serif;
+  --font-body:    'Crimson Pro', 'Palatino Linotype', Georgia, serif;
+  --font-mono:    'Cascadia Code', 'Fira Code', 'Courier New', monospace;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  --transition-fast:   0.15s ease;
+  --transition-normal: 0.25s ease;
+  --transition-slow:   0.5s ease;
+
+  --nav-h: 60px;
+  --section-pad: 100px 48px;
+  --max-w: 1100px;
+}
+
+/* ── Reset & Base ────────────────────────────────────────────── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 18px;
+}
+
+body {
+  background: var(--void);
+  color: var(--light);
+  font-family: var(--font-body);
+  line-height: 1.65;
+  overflow-x: hidden;
+  cursor: crosshair;
+  -webkit-font-smoothing: antialiased;
+}
+
+img, svg { display: block; max-width: 100%; }
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+
+/* ── Grain overlay ──────────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 256px;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+}
+
+/* ── Scanlines ───────────────────────────────────────────────── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0,0,0,0.055) 2px,
+    rgba(0,0,0,0.055) 4px
+  );
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────── */
+::-webkit-scrollbar        { width: 4px; }
+::-webkit-scrollbar-track  { background: var(--ink); }
+::-webkit-scrollbar-thumb  { background: var(--rim); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+/* ═══════════════════════════════════════════════════════════
+   NAVIGATION
+   ═══════════════════════════════════════════════════════════ */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+  height: var(--nav-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 48px;
+  background: rgba(6,3,4,0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--rim);
+  transition: background var(--transition-normal), border-color var(--transition-normal);
+}
+
+.nav.scrolled {
+  background: rgba(6,3,4,0.97);
+  border-color: var(--muted);
+}
+
+/* Logo */
+.nav__logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-glyph {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 900;
+  line-height: 1;
+  flex-shrink: 0;
+  user-select: none;
+}
+.logo-glyph__shadow { position: absolute; inset: 0; color: #1E160A; }
+.logo-glyph__main {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--glow) 55%, #C44A00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 5px rgba(245,130,10,0.75));
+  animation: glyph-flicker 7s infinite;
+}
+.logo-glyph__slice {
+  position: absolute; inset: 0;
+  color: var(--gold);
+  clip-path: inset(38% 0 38% 0);
+  transform: translateX(3px);
+  opacity: 0.88;
+  animation: glyph-slice 7s infinite;
+}
+
+.nav__wordmark {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--light);
+}
+
+/* Links */
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+}
+
+.nav__link {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  color: var(--ghost);
+  text-transform: uppercase;
+  position: relative;
+  transition: color var(--transition-fast);
+}
+.nav__link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px; left: 0; right: 0;
+  height: 1px;
+  background: var(--glow);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--transition-normal);
+}
+.nav__link:hover            { color: var(--light); }
+.nav__link:hover::after     { transform: scaleX(1); }
+
+/* CTA button */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: none;
+  transition: filter var(--transition-normal), transform var(--transition-normal);
+}
+
+.btn--primary {
+  font-size: 11px;
+  color: var(--void);
+  background: linear-gradient(135deg, var(--gold) 0%, var(--glow) 100%);
+  padding: 10px 26px;
+  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+}
+.btn--primary:hover {
+  filter: brightness(1.12) drop-shadow(0 0 14px rgba(245,130,10,0.55));
+  transform: translateY(-1px);
+}
+
+.btn--ghost {
+  font-size: 11px;
+  color: var(--ghost);
+  background: transparent;
+  padding: 9px 24px;
+  border: 1px solid var(--rim);
+}
+.btn--ghost:hover {
+  border-color: var(--muted);
+  color: var(--light);
+}
+
+.btn--large {
+  font-size: 13px;
+  padding: 15px 52px;
+  clip-path: polygon(14px 0%, 100% 0%, calc(100% - 14px) 100%, 0% 100%);
+}
+
+/* Hamburger */
+.nav__hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 4px;
+  background: transparent;
+  border: none;
+}
+.nav__hamburger span {
+  display: block;
+  width: 22px;
+  height: 1.5px;
+  background: var(--ghost);
+  transition: all var(--transition-normal);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SHARED SECTION STYLES
+   ═══════════════════════════════════════════════════════════ */
+.section { padding: var(--section-pad); position: relative; }
+.section--dark { background: var(--ink); }
+.section--void { background: var(--void); }
+
+.section__inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+}
+
+.section__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.55em;
+  text-transform: uppercase;
+  color: var(--glow);
+  margin-bottom: 14px;
+}
+.section__eyebrow::before {
+  content: '';
+  width: 22px;
+  height: 1px;
+  background: var(--glow);
+  flex-shrink: 0;
+}
+
+.section__title {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3.8vw, 46px);
+  font-weight: 900;
+  line-height: 1.12;
+  color: var(--light);
+  margin-bottom: 14px;
+}
+
+.section__title em {
+  font-style: normal;
+  background: linear-gradient(90deg, var(--gold), var(--glow));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section__lead {
+  font-size: 17px;
+  font-weight: 300;
+  color: var(--ghost);
+  line-height: 1.75;
+  max-width: 560px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HERO
+   ═══════════════════════════════════════════════════════════ */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--nav-h) + 60px) 48px 80px;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+
+/* Ambient glow */
+.hero__glow {
+  position: absolute;
+  top: 40%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 900px;
+  height: 600px;
+  background: radial-gradient(ellipse at center,
+    rgba(245,130,10,0.075) 0%,
+    rgba(245,130,10,0.03) 40%,
+    transparent 70%);
+  pointer-events: none;
+}
+
+/* Grid */
+.hero__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(46,31,10,0.5) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(46,31,10,0.5) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse 85% 70% at 50% 50%, black 15%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 85% 70% at 50% 50%, black 15%, transparent 80%);
+  animation: grid-drift 20s linear infinite;
+}
+
+@keyframes grid-drift {
+  0%   { background-position: 0 0; }
+  100% { background-position: 80px 80px; }
+}
+
+/* Vignette */
+.hero__vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(6,3,4,0.6) 100%);
+  pointer-events: none;
+}
+
+.hero__content {
+  position: relative;
+  z-index: 2;
+  max-width: 860px;
+}
+
+/* Giant glitched S */
+.hero__glyph {
+  position: relative;
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: clamp(110px, 18vw, 210px);
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 28px;
+  user-select: none;
+}
+.hg__shadow { position: absolute; inset: 0; color: #180F06; z-index: 0; }
+.hg__main {
+  position: relative; z-index: 2;
+  background: linear-gradient(160deg, var(--gold) 0%, var(--glow) 45%, #B35000 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 28px rgba(245,130,10,0.38)) drop-shadow(0 0 56px rgba(245,130,10,0.12));
+  animation: hg-flicker 5.5s infinite;
+}
+.hg__s1 { position:absolute;inset:0;z-index:3;color:var(--gold);  clip-path:inset(44% 0 42% 0); animation:hg-s1 5.5s infinite; }
+.hg__s2 { position:absolute;inset:0;z-index:3;color:var(--glow);  clip-path:inset(21% 0 67% 0); animation:hg-s2 5.5s infinite; }
+.hg__s3 { position:absolute;inset:0;z-index:3;color:var(--gold);  clip-path:inset(68% 0 17% 0); animation:hg-s3 5.5s infinite; }
+.hg__cy { position:absolute;inset:0;z-index:4;color:#00e5ff;opacity:0;clip-path:inset(40% 0 44% 0);animation:hg-cy 5.5s infinite; }
+.hg__re { position:absolute;inset:0;z-index:4;color:#ff2040;opacity:0;clip-path:inset(60% 0 24% 0);animation:hg-re 5.5s infinite; }
+
+.hero__tag {
+  font-family: var(--font-display);
+  font-size: clamp(9px, 1.1vw, 11px);
+  font-weight: 400;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 18px;
+  animation: fade-up 1s 0.2s both;
+}
+
+.hero__title {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 5.5vw, 66px);
+  font-weight: 900;
+  line-height: 1.08;
+  color: var(--light);
+  letter-spacing: -0.01em;
+  margin-bottom: 20px;
+  animation: fade-up 1s 0.4s both;
+}
+
+.hero__sub {
+  font-size: clamp(15px, 1.8vw, 19px);
+  font-weight: 300;
+  color: var(--ghost);
+  max-width: 520px;
+  margin: 0 auto 36px;
+  line-height: 1.75;
+  animation: fade-up 1s 0.6s both;
+}
+
+.hero__ctas {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  animation: fade-up 1s 0.8s both;
+}
+
+/* Decorative bars */
+.hero__divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 52px;
+  animation: fade-up 1s 1s both;
+}
+.hdiv__bar  { height: 1px; background: var(--glow); opacity: 0.35; }
+.hdiv__bar--sm  { width: 18px; }
+.hdiv__bar--md  { width: 36px; opacity: 0.55; }
+.hdiv__bar--lg  { width: 60px; opacity: 0.7; }
+.hdiv__dot {
+  width: 5px; height: 5px;
+  background: var(--glow);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--glow);
+  animation: dot-pulse 2s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURES GRID
+   ═══════════════════════════════════════════════════════════ */
+.features__header { max-width: 560px; margin-bottom: 56px; }
+
+.features__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+}
+
+.feat {
+  background: var(--surface);
+  padding: 36px 30px;
+  position: relative;
+  overflow: hidden;
+  transition: background var(--transition-normal);
+}
+.feat::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--glow) 50%, transparent 100%);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+.feat::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(245,130,10,0.04) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity var(--transition-slow);
+}
+.feat:hover { background: var(--raised); }
+.feat:hover::before { opacity: 1; }
+.feat:hover::after  { opacity: 1; }
+
+.feat__icon {
+  width: 38px; height: 38px;
+  color: var(--glow);
+  margin-bottom: 18px;
+  transition: filter var(--transition-normal);
+}
+.feat:hover .feat__icon {
+  filter: drop-shadow(0 0 6px rgba(245,130,10,0.6));
+}
+
+.feat__title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--light);
+  margin-bottom: 10px;
+}
+
+.feat__desc {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PREVIEW
+   ═══════════════════════════════════════════════════════════ */
+.preview__inner {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 72px;
+  align-items: center;
+}
+
+.preview__desc {
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--ghost);
+  line-height: 1.8;
+  margin-bottom: 36px;
+}
+
+.stats { display: flex; flex-direction: column; gap: 4px; }
+
+.stat {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--rim);
+}
+.stat:last-child { border-bottom: none; }
+
+.stat__num {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 900;
+  background: linear-gradient(90deg, var(--gold), var(--glow));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  min-width: 56px;
+}
+
+.stat__label {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+/* Executor window mock */
+.exec-window {
+  background: var(--ink);
+  border: 1px solid var(--rim);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(245,130,10,0.08),
+    0 0 40px rgba(245,130,10,0.06),
+    0 40px 80px rgba(0,0,0,0.55);
+  position: relative;
+}
+
+/* top glow border */
+.exec-window::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 20%; right: 20%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(245,130,10,0.6), transparent);
+  z-index: 1;
+}
+
+.exec__titlebar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--rim);
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+}
+
+.exec__logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--light);
+}
+
+.exec__logo-s {
+  position: relative;
+  width: 14px; height: 14px;
+  font-size: 14px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  line-height: 1;
+}
+.exec__logo-s .s-b { position:absolute; color:#1E160A; }
+.exec__logo-s .s-m {
+  position:absolute;
+  background: linear-gradient(135deg, var(--gold), var(--glow));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  filter: drop-shadow(0 0 3px rgba(245,130,10,0.7));
+}
+.exec__logo-s .s-s { position:absolute; color:var(--gold); clip-path:inset(38% 0 38% 0); transform:translateX(2px); }
+
+.winctrls { display:flex; gap:5px; }
+.winctrl  { width:10px; height:10px; border-radius:50%; }
+.winctrl--close    { background:#ff5f57; }
+.winctrl--minimize { background:#febc2e; }
+.winctrl--maximize { background:#28c840; }
+
+.exec__editor {
+  background: #0B0A07;
+  padding: 12px 16px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.65;
+  min-height: 150px;
+}
+
+.code-line { display: flex; }
+.ln {
+  color: rgba(46,31,10,0.8);
+  margin-right: 18px;
+  user-select: none;
+  min-width: 16px;
+  text-align: right;
+}
+.kw  { color: #F5820A; font-weight: 600; }
+.fn  { color: #FFB730; font-weight: 600; }
+.str { color: #C49A5A; }
+.cmt { color: #3A2810; font-style: italic; }
+.num { color: #FFB730; }
+.var { color: #E8C88A; }
+
+/* Typing cursor */
+.cursor {
+  display: inline-block;
+  width: 2px; height: 1em;
+  background: var(--glow);
+  vertical-align: text-bottom;
+  margin-left: 1px;
+  animation: blink 1.1s step-end infinite;
+}
+
+.exec__toolbar {
+  background: var(--surface);
+  border-top: 1px solid var(--rim);
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+}
+
+.exec__btn {
+  width: 32px; height: 32px;
+  border: 1px solid var(--rim);
+  border-radius: var(--radius-md);
+  background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+.exec__btn:hover { background: var(--raised); border-color: var(--muted); }
+.exec__btn--execute { color: var(--glow); }
+.exec__btn--inject  { color: var(--ghost); }
+
+/* ═══════════════════════════════════════════════════════════
+   HOW IT WORKS
+   ═══════════════════════════════════════════════════════════ */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-top: 56px;
+}
+
+.step {
+  background: var(--surface);
+  padding: 40px 30px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Arrow connectors */
+.step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: -13px; top: 50%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-left-color: var(--rim);
+  z-index: 2;
+}
+
+.step__num {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.45em;
+  color: var(--muted);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.step__num::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--rim);
+}
+
+.step__icon {
+  color: var(--glow);
+  width: 34px; height: 34px;
+  margin-bottom: 16px;
+}
+
+.step__title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--light);
+  margin-bottom: 10px;
+}
+
+.step__desc {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DOWNLOAD CTA
+   ═══════════════════════════════════════════════════════════ */
+.cta {
+  text-align: center;
+  padding: 120px 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta__ambient {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 700px; height: 400px;
+  background: radial-gradient(ellipse, rgba(245,130,10,0.055) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cta__brackets {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-bottom: 36px;
+}
+.cta__bracket {
+  width: 18px; height: 18px;
+  border-color: rgba(46,31,10,0.8);
+  border-style: solid;
+}
+.cta__bracket--tl { border-width: 1px 0 0 1px; }
+.cta__bracket--tr { border-width: 1px 1px 0 0; }
+
+.cta__title {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 4.5vw, 50px);
+  font-weight: 900;
+  color: var(--light);
+  margin-bottom: 14px;
+}
+
+.cta__sub {
+  font-size: 17px;
+  font-weight: 300;
+  color: var(--ghost);
+  margin-bottom: 36px;
+}
+
+.cta__meta {
+  font-family: var(--font-display);
+  font-size: 9px;
+  letter-spacing: 0.35em;
+  color: var(--muted);
+  margin-top: 14px;
+  text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════════════════ */
+.footer {
+  background: var(--ink);
+  border-top: 1px solid var(--rim);
+  padding: 36px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.footer__logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer__wordmark {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--ghost);
+  text-transform: uppercase;
+}
+
+.footer__copy {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--muted);
+  letter-spacing: 0.03em;
+}
+
+.footer__links {
+  display: flex;
+  gap: 26px;
+}
+
+.footer__link {
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: color var(--transition-fast);
+}
+.footer__link:hover { color: var(--ghost); }
+
+/* ═══════════════════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════════════════ */
+@keyframes glyph-flicker {
+  0%,100%{opacity:1}
+  93%{opacity:1} 93.4%{opacity:0.72} 93.8%{opacity:1}
+  96.5%{opacity:1} 96.8%{opacity:0.5} 97.1%{opacity:1}
+}
+@keyframes glyph-slice {
+  0%,89%,100%{transform:translateX(3px)}
+  90%{transform:translateX(9px)}
+  91%{transform:translateX(-3px)}
+  92%{transform:translateX(3px)}
+}
+@keyframes hg-flicker {
+  0%,100%{filter:drop-shadow(0 0 28px rgba(245,130,10,.38)) drop-shadow(0 0 56px rgba(245,130,10,.12))}
+  90%{filter:drop-shadow(0 0 28px rgba(245,130,10,.38)) drop-shadow(0 0 56px rgba(245,130,10,.12))}
+  90.5%{filter:drop-shadow(0 0 50px rgba(245,130,10,.75)) drop-shadow(0 0 80px rgba(245,130,10,.35))}
+  91%{filter:drop-shadow(0 0 18px rgba(245,130,10,.18))}
+  91.5%{filter:drop-shadow(0 0 28px rgba(245,130,10,.38)) drop-shadow(0 0 56px rgba(245,130,10,.12))}
+}
+@keyframes hg-s1 {
+  0%,87%,100%{transform:translateX(0)} 88%{transform:translateX(14px)} 88.8%{transform:translateX(-6px)} 89.5%{transform:translateX(0)}
+  95%{transform:translateX(0)} 95.4%{transform:translateX(9px)} 95.8%{transform:translateX(0)}
+}
+@keyframes hg-s2 {
+  0%,87%,100%{transform:translateX(0)} 88%{transform:translateX(-10px)} 88.8%{transform:translateX(5px)} 89.5%{transform:translateX(0)}
+}
+@keyframes hg-s3 {
+  0%,87%,100%{transform:translateX(0)} 88%{transform:translateX(11px)} 88.6%{transform:translateX(-5px)} 89.2%{transform:translateX(0)}
+  95%{transform:translateX(-8px)} 95.5%{transform:translateX(0)}
+}
+@keyframes hg-cy {
+  0%,87%,100%{opacity:0} 88%{opacity:.17;transform:translateX(-6px)} 88.6%{opacity:0}
+  95%{opacity:.1;transform:translateX(-4px)} 95.3%{opacity:0}
+}
+@keyframes hg-re {
+  0%,87%,100%{opacity:0} 88%{opacity:.14;transform:translateX(7px)} 88.6%{opacity:0}
+  95%{opacity:.09;transform:translateX(5px)} 95.3%{opacity:0}
+}
+@keyframes fade-up {
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:none; }
+}
+@keyframes dot-pulse {
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:0.35;transform:scale(0.75)}
+}
+@keyframes blink {
+  0%,100%{opacity:1} 50%{opacity:0}
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .features__grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 900px) {
+  :root { --section-pad: 72px 24px; }
+  .nav { padding: 0 24px; }
+  .nav__links { display: none; }
+  .nav__hamburger { display: flex; }
+  .hero { padding: calc(var(--nav-h) + 40px) 24px 60px; }
+  .preview__inner { grid-template-columns: 1fr; gap: 48px; }
+  .steps { grid-template-columns: 1fr; }
+  .step:not(:last-child)::after { display: none; }
+  .footer { padding: 28px 24px; flex-direction: column; align-items: flex-start; }
+}
+
+@media (max-width: 600px) {
+  .features__grid { grid-template-columns: 1fr; }
+  .hero__ctas { flex-direction: column; align-items: center; }
+  .btn--large { padding: 14px 36px; }
+}
+  </style>
+</head>
+<body>
+
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <a href="#" class="nav__logo" aria-label="Silicium home">
+    <div class="logo-glyph" aria-hidden="true">
+      <span class="logo-glyph__shadow">S</span>
+      <span class="logo-glyph__main">S</span>
+      <span class="logo-glyph__slice">S</span>
+    </div>
+    <span class="nav__wordmark">Silicium</span>
+  </a>
+  <ul class="nav__links" role="list">
+    <li><a href="#features" class="nav__link">Features</a></li>
+    <li><a href="#preview"  class="nav__link">Preview</a></li>
+    <li><a href="#how"      class="nav__link">Setup</a></li>
+  </ul>
+  <a href="#download" class="btn btn--primary">Download</a>
+  <button class="nav__hamburger" aria-label="Toggle navigation" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<section class="hero" id="home">
+  <div class="hero__glow"     aria-hidden="true"></div>
+  <div class="hero__grid"     aria-hidden="true"></div>
+  <div class="hero__vignette" aria-hidden="true"></div>
+  <div class="hero__content">
+    <p class="hero__tag">Roblox Script Executor</p>
+    <div class="hero__glyph" aria-hidden="true">
+      <span class="hg__shadow">S</span>
+      <span class="hg__main">S</span>
+      <span class="hg__s1">S</span>
+      <span class="hg__s2">S</span>
+      <span class="hg__s3">S</span>
+      <span class="hg__cy">S</span>
+      <span class="hg__re">S</span>
+    </div>
+    <h1 class="hero__title">Execute Without<br><em>Compromise</em></h1>
+    <p class="hero__sub">Silicium is a precision-built Roblox executor — minimal interface, instant injection, zero bloat.</p>
+    <div class="hero__ctas">
+      <a href="#download" class="btn btn--primary btn--large">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <path d="M7.5 1v9M3.5 7l4 4 4-4M1 12.5v1h13v-1"/>
+        </svg>
+        Download Free
+      </a>
+      <a href="#features" class="btn btn--ghost">See Features</a>
+    </div>
+    <div class="hero__divider" aria-hidden="true">
+      <div class="hdiv__bar hdiv__bar--sm"></div>
+      <div class="hdiv__bar hdiv__bar--md"></div>
+      <div class="hdiv__bar hdiv__bar--lg"></div>
+      <div class="hdiv__dot"></div>
+      <div class="hdiv__bar hdiv__bar--lg"></div>
+      <div class="hdiv__bar hdiv__bar--md"></div>
+      <div class="hdiv__bar hdiv__bar--sm"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section--dark" id="features">
+  <div class="section__inner">
+    <header class="features__header reveal">
+      <p class="section__eyebrow">Capabilities</p>
+      <h2 class="section__title">Built for Precision</h2>
+      <p class="section__lead">Every feature exists for a reason. Nothing added unless it makes executing faster or the experience cleaner.</p>
+    </header>
+    <div class="features__grid">
+      <div class="feat reveal reveal-delay-1">
+        <svg class="feat__icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+          <circle cx="20" cy="20" r="15"/><line x1="20" y1="9" x2="20" y2="31"/><line x1="9" y1="20" x2="31" y2="20"/>
+          <circle cx="20" cy="20" r="3" fill="currentColor" stroke="none"/>
+        </svg>
+        <h3 class="feat__title">Instant Injection</h3>
+        <p class="feat__desc">One click attaches to your Roblox process. No delays, no confirmation dialogs — just immediate access.</p>
+      </div>
+      <div class="feat reveal reveal-delay-2">
+        <svg class="feat__icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+          <polyline points="8,30 16,18 22,25 32,12"/><path d="M28,12 h4 v4"/>
+        </svg>
+        <h3 class="feat__title">Syntax Highlighting</h3>
+        <p class="feat__desc">Full Lua support with Waylay-themed colors. Keywords, globals, strings — all visually distinct in the editor.</p>
+      </div>
+      <div class="feat reveal reveal-delay-3">
+        <svg class="feat__icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+          <rect x="8" y="8" width="24" height="24" rx="3"/><path d="M14,20 l4,4 8-8"/>
+        </svg>
+        <h3 class="feat__title">Auto-Update</h3>
+        <p class="feat__desc">Backend files download and update on every launch automatically. Always on the latest version with zero manual effort.</p>
+      </div>
+      <div class="feat reveal reveal-delay-1">
+        <svg class="feat__icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+          <rect x="6" y="10" width="28" height="22" rx="3"/><line x1="6" y1="17" x2="34" y2="17"/><line x1="14" y1="10" x2="14" y2="17"/>
+        </svg>
+        <h3 class="feat__title">Minimal Interface</h3>
+        <p class="feat__desc">Frameless transparent window. No bloated chrome, no clutter — nothing between you and your scripts.</p>
+      </div>
+      <div class="feat reveal reveal-delay-2">
+        <svg class="feat__icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+          <rect x="6" y="12" width="28" height="20" rx="2"/><path d="M14,12 V9 a6,6 0 0,1 12,0 v3"/><circle cx="20" cy="22" r="3"/>
+        </svg>
+        <h3 class="feat__title">Encrypted Pipe IPC</h3>
+        <p class="feat__desc">Scripts travel over AES-encrypted named pipes for reliable, low-latency execution inside the game process.</p>
+      </div>
+      <div class="feat reveal reveal-delay-3">
+        <svg class="feat__icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+          <path d="M8,22 Q14,12 20,22 Q26,32 32,22"/>
+          <circle cx="8" cy="22" r="2" fill="currentColor" stroke="none"/>
+          <circle cx="32" cy="22" r="2" fill="currentColor" stroke="none"/>
+        </svg>
+        <h3 class="feat__title">In-Game Notifications</h3>
+        <p class="feat__desc">Custom Roblox notifications confirm injection in-game. Title, message, and duration are editable in source.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section--void" id="preview">
+  <div class="section__inner preview__inner">
+    <div class="preview__text">
+      <p class="section__eyebrow reveal">Interface</p>
+      <h2 class="section__title reveal">Clean by Design</h2>
+      <p class="preview__desc reveal">Every pixel deliberate. The Waylay palette — deep void blacks, amber midtones, sharp orange accents — keeps scripts readable and the UI invisible.</p>
+      <div class="stats reveal">
+        <div class="stat"><span class="stat__num">0</span><span class="stat__label">ads, trackers or background telemetry</span></div>
+        <div class="stat"><span class="stat__num">1</span><span class="stat__label">click injection — no multi-step process</span></div>
+        <div class="stat"><span class="stat__num">∞</span><span class="stat__label">scripts — no execution limits</span></div>
+      </div>
+    </div>
+    <div class="exec-window reveal">
+      <div class="exec__titlebar">
+        <div class="exec__logo">
+          <div class="exec__logo-s" aria-hidden="true">
+            <span class="s-b">S</span><span class="s-m">S</span><span class="s-s">S</span>
+          </div>
+          Silicium
+        </div>
+        <div class="winctrls" aria-hidden="true">
+          <div class="winctrl winctrl--close"></div>
+          <div class="winctrl winctrl--minimize"></div>
+          <div class="winctrl winctrl--maximize"></div>
+        </div>
+      </div>
+      <div class="exec__editor" aria-label="Script editor preview">
+        <div class="code-line"><span class="ln">1</span><span class="cmt">-- Silicium executor</span></div>
+        <div class="code-line"><span class="ln">2</span><span class="kw">local</span> <span class="var">Players</span> = <span class="fn">game</span>:<span class="var">GetService</span>(<span class="str">"Players"</span>)</div>
+        <div class="code-line"><span class="ln">3</span><span class="kw">local</span> <span class="var">lp</span> = Players.LocalPlayer</div>
+        <div class="code-line"><span class="ln">4</span></div>
+        <div class="code-line"><span class="ln">5</span><span class="kw">for</span> _, v <span class="kw">in</span> <span class="fn">pairs</span>(workspace:GetDescendants()) <span class="kw">do</span></div>
+        <div class="code-line"><span class="ln">6</span>&nbsp;&nbsp;<span class="kw">if</span> v:IsA(<span class="str">"BasePart"</span>) <span class="kw">then</span></div>
+        <div class="code-line"><span class="ln">7</span>&nbsp;&nbsp;&nbsp;&nbsp;v.Transparency = <span class="num">0.5</span><span class="cursor"></span></div>
+        <div class="code-line"><span class="ln">8</span>&nbsp;&nbsp;<span class="kw">end</span></div>
+        <div class="code-line"><span class="ln">9</span><span class="kw">end</span></div>
+      </div>
+      <div class="exec__toolbar">
+        <button class="exec__btn exec__btn--execute" title="Execute">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><path d="M3 2 L12 7 L3 12 Z"/></svg>
+        </button>
+        <button class="exec__btn exec__btn--inject" title="Inject">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+            <line x1="7" y1="1" x2="7" y2="9"/><polyline points="4,6 7,9 10,6"/><line x1="2" y1="12" x2="12" y2="12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section--dark" id="how">
+  <div class="section__inner">
+    <header class="reveal">
+      <p class="section__eyebrow">Setup</p>
+      <h2 class="section__title">Three Steps</h2>
+    </header>
+    <div class="steps">
+      <div class="step reveal reveal-delay-1">
+        <svg class="step__icon" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+          <line x1="18" y1="4" x2="18" y2="24"/><polyline points="10,16 18,24 26,16"/><line x1="6" y1="29" x2="30" y2="29"/>
+        </svg>
+        <div class="step__num">01</div>
+        <h3 class="step__title">Download</h3>
+        <p class="step__desc">Grab the latest build. Extract anywhere — no installer, no registry writes, no UAC prompts.</p>
+      </div>
+      <div class="step reveal reveal-delay-2">
+        <svg class="step__icon" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+          <circle cx="18" cy="18" r="13"/><line x1="9" y1="18" x2="14" y2="18"/><line x1="22" y1="18" x2="27" y2="18"/>
+          <circle cx="18" cy="18" r="3" fill="currentColor" stroke="none"/>
+        </svg>
+        <div class="step__num">02</div>
+        <h3 class="step__title">Launch</h3>
+        <p class="step__desc">Run Silicium.exe. On first launch it auto-downloads required backend files — nothing else needed.</p>
+      </div>
+      <div class="step reveal reveal-delay-3">
+        <svg class="step__icon" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+          <polygon points="9,5 28,18 9,31" fill="none"/>
+        </svg>
+        <div class="step__num">03</div>
+        <h3 class="step__title">Inject &amp; Execute</h3>
+        <p class="step__desc">Open Roblox, press Inject, paste your script, hit Execute. Done.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta section--void" id="download">
+  <div class="cta__ambient" aria-hidden="true"></div>
+  <div class="cta__brackets reveal" aria-hidden="true">
+    <div class="cta__bracket cta__bracket--tl"></div>
+    <p class="section__eyebrow" style="margin:0">Free Download</p>
+    <div class="cta__bracket cta__bracket--tr"></div>
+  </div>
+  <h2 class="cta__title reveal">Ready to <em>Execute</em>?</h2>
+  <p class="cta__sub reveal">No account. No subscription. No limits.</p>
+  <div class="reveal">
+    <a href="#" class="btn btn--primary btn--large">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <path d="M7.5 1v9M3.5 7l4 4 4-4M1 12.5v1h13v-1"/>
+      </svg>
+      Download Silicium
+    </a>
+    <p class="cta__meta">Beta · Windows x64 · Powered by Velocity</p>
+  </div>
+</section>
+
+<footer class="footer" role="contentinfo">
+  <div class="footer__logo">
+    <div class="logo-glyph" style="width:20px;height:20px;font-size:20px" aria-hidden="true">
+      <span class="logo-glyph__shadow">S</span>
+      <span class="logo-glyph__main">S</span>
+      <span class="logo-glyph__slice">S</span>
+    </div>
+    <span class="footer__wordmark">Silicium</span>
+  </div>
+  <p class="footer__copy">© 2025 Silicium. For educational purposes only.</p>
+  <ul class="footer__links" role="list">
+    <li><a href="#" class="footer__link">Discord</a></li>
+    <li><a href="#" class="footer__link">GitHub</a></li>
+    <li><a href="#" class="footer__link">ToS</a></li>
+  </ul>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   SILICIUM — Main JS
+   ═══════════════════════════════════════════════════════════ */
+
+'use strict';
+
+/* ── Scroll Reveal ──────────────────────────────────────────── */
+(function initReveal() {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+})();
+
+/* ── Nav scroll state ───────────────────────────────────────── */
+(function initNav() {
+  const nav = document.querySelector('.nav');
+  if (!nav) return;
+
+  const onScroll = () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+
+/* ── Hamburger ──────────────────────────────────────────────── */
+(function initHamburger() {
+  const btn   = document.querySelector('.nav__hamburger');
+  const links = document.querySelector('.nav__links');
+  if (!btn || !links) return;
+
+  btn.addEventListener('click', () => {
+    const open = links.classList.toggle('nav__links--open');
+    btn.setAttribute('aria-expanded', open);
+  });
+
+  // Close on link click
+  links.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => links.classList.remove('nav__links--open'));
+  });
+})();
+
+/* ── Hero grid parallax ─────────────────────────────────────── */
+(function initParallax() {
+  const grid = document.querySelector('.hero__grid');
+  if (!grid) return;
+
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        grid.style.transform = `translateY(${window.scrollY * 0.12}px)`;
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+})();
+
+/* ── Code editor typewriter ─────────────────────────────────── */
+(function initTypewriter() {
+  const editor = document.querySelector('.exec__editor');
+  if (!editor) return;
+
+  const lines = [
+    `<span class="ln">1</span><span class="cmt">-- Silicium v1.0</span>`,
+    `<span class="ln">2</span><span class="kw">local</span> <span class="var">Players</span> = <span class="fn">game</span>:<span class="var">GetService</span>(<span class="str">"Players"</span>)`,
+    `<span class="ln">3</span><span class="kw">local</span> <span class="var">lp</span> = Players.LocalPlayer`,
+    `<span class="ln">4</span>`,
+    `<span class="ln">5</span><span class="kw">for</span> _, v <span class="kw">in</span> <span class="fn">pairs</span>(workspace:GetDescendants()) <span class="kw">do</span>`,
+    `<span class="ln">6</span>&nbsp;&nbsp;<span class="kw">if</span> v:IsA(<span class="str">"BasePart"</span>) <span class="kw">then</span>`,
+    `<span class="ln">7</span>&nbsp;&nbsp;&nbsp;&nbsp;v.Transparency = <span class="num">0.5</span>`,
+    `<span class="ln">8</span>&nbsp;&nbsp;<span class="kw">end</span>`,
+    `<span class="ln">9</span><span class="kw">end</span>`,
+  ];
+
+  // Just render statically — no need to animate in a screenshot preview
+  editor.innerHTML = lines.map(l => `<div class="code-line">${l}</div>`).join('');
+})();
+
+/* ── Smooth anchor scroll ───────────────────────────────────── */
+(function initSmoothScroll() {
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (!target) return;
+      e.preventDefault();
+      const navH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 60;
+      const top = target.getBoundingClientRect().top + window.scrollY - navH;
+      window.scrollTo({ top, behavior: 'smooth' });
+    });
+  });
+})();
+
+/* ── Active nav link highlight ──────────────────────────────── */
+(function initActiveLink() {
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('.nav__link[href^="#"]');
+  if (!sections.length || !links.length) return;
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.nav__link[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.4 });
+
+  sections.forEach(s => observer.observe(s));
+})();
+</script>
+</body>
+</html>
