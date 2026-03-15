@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comparatives Trainer 300</title>
+
+<style>
+body{
+font-family:system-ui;
+background:#0f172a;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+}
+
+.card{
+background:#1e293b;
+width:90%;
+max-width:420px;
+border-radius:20px;
+padding:30px 20px;
+text-align:center;
+box-shadow:0 10px 25px rgba(0,0,0,0.5);
+}
+
+.progress{
+opacity:0.7;
+font-size:14px;
+}
+
+.word{
+font-size:36px;
+margin:20px 0;
+font-weight:600;
+}
+
+.answer{
+font-size:22px;
+color:#22c55e;
+display:none;
+margin-bottom:20px;
+}
+
+.buttons{
+display:flex;
+flex-direction:column;
+gap:12px;
+}
+
+button{
+padding:14px;
+border:none;
+border-radius:12px;
+font-size:16px;
+cursor:pointer;
+}
+
+.show{background:#3b82f6;color:white;}
+.next{background:#22c55e;color:white;}
+
+button:active{transform:scale(0.96);}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<div class="progress" id="progress"></div>
+<div class="word" id="word"></div>
+<div class="answer" id="answer"></div>
+
+<div class="buttons">
+<button class="show" onclick="showAnswer()">Lösung anzeigen</button>
+<button class="next" onclick="nextCard()">Nächste Karte</button>
+</div>
+
+</div>
+
+<script>
+
+// Basis Wörter
+const baseWords = [
+"fast","slow","big","small","tall","short","old","young","strong","weak",
+"happy","funny","easy","busy","heavy","hot","cold","nice","large","late",
+"early","long","wide","dark","bright","clean","dirty","rich","poor","loud",
+"quiet","smart","kind","friendly","angry","safe","dangerous","beautiful","interesting","boring",
+"expensive","cheap","important","famous","popular","comfortable","difficult","exciting","useful","careful",
+"powerful","modern","ancient","colorful","delicious","crowded","noisy","dry","wet","thin",
+"thick","soft","hard","warm","cool","fresh","sweet","salty","spicy","tasty",
+"healthy","simple","complex","active","lazy","brave","calm","polite","rude","lucky",
+"unlucky","helpful","hopeful","careless","creative","curious","generous","serious","fancy","plain",
+"proud","shy","lonely","free","full","empty","deep","shallow","sharp","smooth",
+"rough","wild","tight","loose","clear","cloudy","rainy","sunny","windy","stormy"
+]
+
+// Funktion um comparative zu bilden
+function comparative(word){
+
+if(word==="good") return "better – the best"
+if(word==="bad") return "worse – the worst"
+if(word==="far") return "farther – the farthest"
+
+if(word.endsWith("y")){
+let base=word.slice(0,-1)
+return base+"ier – the "+base+"iest"
+}
+
+if(word.length<=5){
+return word+"er – the "+word+"est"
+}
+
+return "more "+word+" – the most "+word
+
+}
+
+// 300 Karten generieren
+let vocab=[]
+
+for(let i=0;i<300;i++){
+
+let w = baseWords[i % baseWords.length]
+
+vocab.push({
+w:w,
+a:comparative(w)
+})
+
+}
+
+let index=0
+
+const word=document.getElementById("word")
+const answer=document.getElementById("answer")
+const progress=document.getElementById("progress")
+
+function loadCard(){
+word.textContent=vocab[index].w
+answer.textContent=vocab[index].a
+answer.style.display="none"
+progress.textContent=(index+1)+" / "+vocab.length
+}
+
+function showAnswer(){
+answer.style.display="block"
+}
+
+function nextCard(){
+index++
+if(index>=vocab.length) index=0
+loadCard()
+}
+
+loadCard()
+
+</script>
+
+</body>
+</html>
